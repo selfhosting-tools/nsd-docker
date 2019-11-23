@@ -1,6 +1,6 @@
 # selfhosting-tools/nsd-docker
 
-[![Build Status](https://travis-ci.org/selfhosting-tools/services-monitoring.svg?branch=master)](https://travis-ci.org/selfhosting-tools/services-monitoring)
+[![Build Status](https://travis-ci.org/selfhosting-tools/nsd-docker.svg?branch=master)](https://travis-ci.org/selfhosting-tools/nsd-docker)
 
 Based on [hardware/nsd-dnssec](https://github.com/hardware/nsd-dnssec)
 
