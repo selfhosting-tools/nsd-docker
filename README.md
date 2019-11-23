@@ -1,8 +1,8 @@
 # selfhosting-tools/nsd-docker
 
-Based on [hardware/nsd-dnssec](https://github.com/hardware/nsd-dnssec)
+[![Build Status](https://travis-ci.org/selfhosting-tools/services-monitoring.svg?branch=master)](https://travis-ci.org/selfhosting-tools/services-monitoring)
 
-![nsd](https://i.imgur.com/tPgkQVB.png "nsd")
+Based on [hardware/nsd-dnssec](https://github.com/hardware/nsd-dnssec)
 
 ### What is this?
 
