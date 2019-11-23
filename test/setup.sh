@@ -9,15 +9,15 @@ docker build --no-cache -t nsd-docker:latest .
 docker run \
     -d \
     --name nsd_unsigned \
-    -v "`pwd`/test/config/nsd.conf":/etc/nsd/nsd.conf \
-    -v "`pwd`/test/config/db.example.org":/zones/db.example.org \
+    -v "$(pwd)/test/config/nsd.conf":/etc/nsd/nsd.conf \
+    -v "$(pwd)/test/config/db.example.org":/zones/db.example.org \
     -t nsd-docker:latest
 
 docker run \
     -d \
     --name nsd_default \
-    -v "`pwd`/test/config/nsd.conf":/etc/nsd/nsd.conf \
-    -v "`pwd`/test/config/db.example.org":/zones/db.example.org \
+    -v "$(pwd)/test/config/nsd.conf":/etc/nsd/nsd.conf \
+    -v "$(pwd)/test/config/db.example.org":/zones/db.example.org \
     -t nsd-docker:latest
 
 sleep 2
