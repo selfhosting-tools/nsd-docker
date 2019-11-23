@@ -1,7 +1,6 @@
-FROM alpine:3.10
+FROM alpine:3.10 as builder
 
-LABEL description "Simple DNS authoritative server with DNSSEC support" \
-      maintainer="Hardware <contact@meshup.net>"
+LABEL maintainer="Selfhosting-tools (https://github.com/selfhosting-tools)"
 
 ARG NSD_VERSION=4.2.3
 
@@ -11,6 +10,7 @@ ARG GPG_SHORTID="0x7E045F8D"
 ARG GPG_FINGERPRINT="EDFA A3F2 CA4E 6EB0 5681  AF8E 9F6F 1C2D 7E04 5F8D"
 ARG SHA256_HASH="817d963b39d2af982f6a523f905cfd5b14a3707220a8da8f3013f34cdfe5c498"
 
+
 ENV UID=991 GID=991
 
 RUN apk add --no-cache --virtual build-dependencies \
@@ -19,12 +19,6 @@ RUN apk add --no-cache --virtual build-dependencies \
       libevent-dev \
       openssl-dev \
       ca-certificates \
- && apk add --no-cache \
-      ldns \
-      ldns-tools \
-      libevent \
-      openssl \
-      tini \
  && cd /tmp \
  && wget -q https://www.nlnetlabs.nl/downloads/nsd/nsd-${NSD_VERSION}.tar.gz \
  && wget -q https://www.nlnetlabs.nl/downloads/nsd/nsd-${NSD_VERSION}.tar.gz.asc \
@@ -45,10 +39,19 @@ RUN apk add --no-cache --virtual build-dependencies \
  && ./configure \
     CFLAGS="-O2 -flto -fPIE -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security" \
     LDFLAGS="-Wl,-z,now -Wl,-z,relro" \
- && make && make install \
+ && make && make DESTDIR=/builder install \
  && apk del build-dependencies \
  && rm -rf /var/cache/apk/* /tmp/* /root/.gnupg
 
+
+FROM alpine:3.10
+RUN apk add --no-cache \
+   ldns \
+   ldns-tools \
+   libevent \
+   openssl \
+   tini
+COPY --from=builder /builder /
 COPY bin /usr/local/bin
 VOLUME /zones /etc/nsd /var/db/nsd
 EXPOSE 53 53/udp
