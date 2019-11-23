@@ -3,6 +3,6 @@ sudo: required
 services:
   - docker
 script:
-  - bash test/setup_tests.sh
+  - bash test/setup.sh
   - ./test/bats/bin/bats test/tests.bats
   - bash test/clean.sh
