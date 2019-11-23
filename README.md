@@ -4,6 +4,8 @@
 
 Based on [hardware/nsd-dnssec](https://github.com/hardware/nsd-dnssec)
 
+:warning: **WIP** *Refactoring in progress*
+
 ### What is this?
 
 NSD is an authoritative only, high performance, simple and open source name server.
