@@ -11,8 +11,6 @@ ARG GPG_FINGERPRINT="EDFA A3F2 CA4E 6EB0 5681  AF8E 9F6F 1C2D 7E04 5F8D"
 ARG SHA256_HASH="817d963b39d2af982f6a523f905cfd5b14a3707220a8da8f3013f34cdfe5c498"
 
 
-ENV UID=991 GID=991
-
 RUN apk add --no-cache --virtual build-dependencies \
       gnupg \
       build-base \
@@ -45,14 +43,20 @@ RUN apk add --no-cache --virtual build-dependencies \
 
 
 FROM alpine:3.10
+
+ENV UID=991 GID=991
+
 RUN apk add --no-cache \
    ldns \
    ldns-tools \
    libevent \
    openssl \
    tini
+
 COPY --from=builder /builder /
 COPY bin /usr/local/bin
+
 VOLUME /zones /etc/nsd /var/db/nsd
 EXPOSE 53 53/udp
+
 CMD ["run.sh"]
