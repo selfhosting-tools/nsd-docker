@@ -1,6 +1,8 @@
 language: bash
 sudo: required
 services:
-- docker
+  - docker
 script:
-- make all
+  - ./test/setup_tests.sh
+  - ./test/bats/bin/bats test/tests.bats
+  - ./test/clean.sh
