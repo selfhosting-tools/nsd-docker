@@ -9,6 +9,9 @@ jobs:
       script:
         - bash test/linters.sh
     - stage: test
+      env:
+        global:
+        - export PATH="/usr/local/bin:$PATH"
       before_install:
       # install bats (https://github.com/bats-core/bats-core/wiki/Install)
       - |
@@ -23,5 +26,5 @@ jobs:
         fi
       script:
         - bash test/setup.sh
-        - /usr/local/bin/bats test/tests.bats
+        - bats test/tests.bats
         - bash test/clean.sh
