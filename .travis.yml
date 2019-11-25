@@ -1,9 +1,14 @@
-language: bash
-sudo: required
+dist: xenial
 services:
   - docker
-script:
-  - bash test/linters.sh
-  - bash test/setup.sh
-  - ./test/bats/bin/bats test/tests.bats
-  - bash test/clean.sh
+
+jobs:
+  include:
+    - stage: lint
+      script:
+        - bash test/linters.sh
+    - stage: test
+      script:
+        - bash test/setup.sh
+        - ./test/bats/bin/bats test/tests.bats
+        - bash test/clean.sh
