@@ -9,7 +9,19 @@ jobs:
       script:
         - bash test/linters.sh
     - stage: test
+      before_install:
+      # install bats (https://github.com/bats-core/bats-core/wiki/Install)
+      - |
+        if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+          branch=master
+          batstmp="$(mktemp -d bats-core-"${branch}".XXXXX)"
+          pushd "${batstmp}" &> /dev/null || return 11
+          curl -sSLO https://github.com/bats-core/bats-core/archive/"${branch}".zip
+          unzip -qo "${branch}".zip
+          sudo bash "${batstmp}"/bats-core-"${branch}"/install.sh /usr/local
+          popd &> /dev/null || return 12
+        fi
       script:
         - bash test/setup.sh
-        - ./test/bats/bin/bats test/tests.bats
+        - /usr/local/bin/bats test/tests.bats
         - bash test/clean.sh
