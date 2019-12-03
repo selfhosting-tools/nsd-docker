@@ -10,5 +10,5 @@ script:
   - bash test/clean.sh
 
 after_success:
-  - echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+  - echo $DOCKER_PASS | docker login -u selfhostingtools --password-stdin
   - docker push selfhostingtools/nsd-docker:latest

@@ -3,7 +3,7 @@
 set -e
 
 # Build Docker image
-docker build --no-cache -t selfhosting-tools/nsd-docker:latest .
+docker build --no-cache -t selfhostingtools/nsd-docker:latest .
 
 # Create test containers
 docker run \
@@ -11,14 +11,14 @@ docker run \
     --name nsd_unsigned \
     -v "$(pwd)/test/config/nsd.conf":/etc/nsd/nsd.conf \
     -v "$(pwd)/test/config/db.example.org":/zones/db.example.org \
-    -t selfhosting-tools/nsd-docker:latest
+    -t selfhostingtools/nsd-docker:latest
 
 docker run \
     -d \
     --name nsd_default \
     -v "$(pwd)/test/config/nsd.conf":/etc/nsd/nsd.conf \
     -v "$(pwd)/test/config/db.example.org":/zones/db.example.org \
-    -t selfhosting-tools/nsd-docker:latest
+    -t selfhostingtools/nsd-docker:latest
 
 sleep 2
 
