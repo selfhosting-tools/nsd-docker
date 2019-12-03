@@ -7,16 +7,18 @@ ARG GPG_FINGERPRINT="EDFAA3F2CA4E6EB05681AF8E9F6F1C2D7E045F8D"
 ARG SHA256_HASH="817d963b39d2af982f6a523f905cfd5b14a3707220a8da8f3013f34cdfe5c498"
 
 RUN apk add --no-cache --virtual build-dependencies \
+      bash \
       curl \
       gnupg \
       build-base \
       libevent-dev \
       openssl-dev \
       ca-certificates
+SHELL [ "/bin/bash", "-o", "pipefail", "-c" ]
 
 WORKDIR /tmp
 RUN \
-   curl -O https://www.nlnetlabs.nl/downloads/nsd/nsd-${NSD_VERSION}.tar.gz{,.asc} && \
+   curl -OO https://www.nlnetlabs.nl/downloads/nsd/nsd-${NSD_VERSION}.tar.gz{,.asc} && \
    echo "Verifying authenticity of nsd-${NSD_VERSION}.tar.gz..." && \
    CHECKSUM=$(sha256sum nsd-${NSD_VERSION}.tar.gz | awk '{print $1}') && \
    if [ "${CHECKSUM}" != "${SHA256_HASH}" ]; then echo "ERROR: Checksum does not match!" && exit 1; fi && \
