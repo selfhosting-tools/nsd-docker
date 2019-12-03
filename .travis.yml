@@ -3,13 +3,12 @@ dist: xenial
 services:
   - docker
 
-jobs:
-  include:
-    - stage: lint
-      script:
-        - bash test/linters.sh
-    - stage: test
-      script:
-        - bash test/setup.sh
-        - ./test/bats/bin/bats test/tests.bats
-        - bash test/clean.sh
+script:
+  - bash test/linters.sh
+  - bash test/setup.sh
+  - ./test/bats/bin/bats test/tests.bats
+  - bash test/clean.sh
+
+after_success:
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
+  - docker push selfhosting-tools/nsd-docker:latest
