@@ -4,4 +4,4 @@ set -e
 
 shellcheck bin/*.sh test/*.sh
 
-halolint Dockerfile
+~/halolint Dockerfile
