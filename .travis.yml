@@ -11,4 +11,4 @@ script:
 
 after_success:
   - echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-  - docker push selfhosting-tools/nsd-docker:latest
+  - docker push selfhostingtools/nsd-docker:latest
