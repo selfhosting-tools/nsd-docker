@@ -35,17 +35,17 @@ load 'test_helper/bats-assert/load'
   assert_success
 }
 
-@test "signzone default date" {
-  run docker exec nsd keygen example.org
+@test "signzone custom date" {
+  run docker exec nsd signzone example.org 20200101
   assert_success
-  assert_line --index 0 'Using default expiration date: 1 month later from now'
+  assert_line --index 0 'Signature will expire on 20200101'
   assert_line --index 1 'Signing zone for example.org'
 }
 
-@test "signzone custom date" {
-  run docker exec nsd keygen example.org 20200101
+@test "signzone default date" {
+  run docker exec nsd signzone example.org
   assert_success
-  assert_line --index 0 'Signature will expire on 20200101'
+  assert_line --index 0 'Using default expiration date: 1 month later from now'
   assert_line --index 1 'Signing zone for example.org'
 }
 
@@ -58,7 +58,7 @@ load 'test_helper/bats-assert/load'
 }
 
 @test "incrementzone" {
-  run docker exec nsd reloadzone example.org
+  run docker exec nsd incrementzone example.org
   assert_success
   assert_line --index 0 'Previous serial is 2019043001'
   assert_line --index 1 'Previous serial is 2019043002'
