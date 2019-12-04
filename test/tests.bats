@@ -14,22 +14,24 @@ load 'test_helper/bats-assert/load'
   assert_output ""
 }
 
-@test "generate key" {
+@test "remote control keys" {
   run docker exec nsd_unsigned [ ! -f /etc/nsd/*.key ]
   assert_success
   run docker exec nsd_unsigned [ ! -f /etc/nsd/*.pem ]
   assert_success
+}
+
+@test "generate key" {
   run docker exec nsd_unsigned keygen example.org
   assert_success
   assert_output "Generating ZSK & KSK keys for 'example.org'"
-  # FIXME: Are the tests below adapted?
-  run docker exec nsd_unsigned [ -f /etc/nsd/nsd_control.key ]
+  run docker exec nsd_unsigned [ -f /zones/Kexample.org.ksk.key ]
   assert_success
-  run docker exec nsd_unsigned [ -f /etc/nsd/nsd_control.pem ]
+  run docker exec nsd_unsigned [ -f /zones/Kexample.org.ksk.private ]
   assert_success
-  run docker exec nsd_unsigned [ -f /etc/nsd/nsd_server.key ]
+  run docker exec nsd_unsigned [ -f /zones/Kexample.org.zsk.key ]
   assert_success
-  run docker exec nsd_unsigned [ -f /etc/nsd/nsd_server.pem ]
+  run docker exec nsd_unsigned [ -f /zones/Kexample.org.zsk.private ]
   assert_success
 }
 

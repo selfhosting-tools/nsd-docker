@@ -9,15 +9,15 @@ docker build --no-cache -t selfhostingtools/nsd-docker:latest .
 docker run \
     -d \
     --name nsd_unsigned \
-    -v "$(pwd)/test/config/nsd.conf":/etc/nsd/nsd.conf \
-    -v "$(pwd)/test/config/example.org":/zones/example.org \
+    -v "$(pwd)/test/resources/conf":/etc/nsd \
+    -v "$(pwd)/test/resources/zones":/zones \
     -t selfhostingtools/nsd-docker:latest
 
 docker run \
     -d \
     --name nsd_default \
-    -v "$(pwd)/test/config/nsd.conf":/etc/nsd/nsd.conf \
-    -v "$(pwd)/test/config/example.org":/zones/example.org \
+    -v "$(pwd)/test/resources/conf":/etc/nsd \
+    -v "$(pwd)/test/resources/zones":/zones \
     -t selfhostingtools/nsd-docker:latest
 
 sleep 2
