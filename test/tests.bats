@@ -3,40 +3,69 @@ load 'test_helper/bats-assert/load'
 
 
 @test "check zone" {
-  run docker exec nsd_unsigned nsd-checkzone example.org /zones/example.org
+  run docker exec nsd nsd-checkzone example.org /zones/example.org
   assert_success
   assert_output "zone example.org is ok"
 }
 
 @test "check conf" {
-  run docker exec nsd_unsigned nsd-checkconf /etc/nsd/nsd.conf
+  run docker exec nsd nsd-checkconf /etc/nsd/nsd.conf
   assert_success
   assert_output ""
 }
 
 @test "remote control keys" {
-  run docker exec nsd_unsigned [ ! -f /etc/nsd/*.key ]
+  run docker exec nsd [ ! -f /etc/nsd/*.key ]
   assert_success
-  run docker exec nsd_unsigned [ ! -f /etc/nsd/*.pem ]
+  run docker exec nsd [ ! -f /etc/nsd/*.pem ]
   assert_success
 }
 
-@test "generate key" {
-  run docker exec nsd_unsigned keygen example.org
+@test "keygen" {
+  run docker exec nsd keygen example.org
   assert_success
   assert_output "Generating ZSK & KSK keys for 'example.org'"
-  run docker exec nsd_unsigned [ -f /zones/Kexample.org.ksk.key ]
+  run docker exec nsd [ -f /zones/Kexample.org.ksk.key ]
   assert_success
-  run docker exec nsd_unsigned [ -f /zones/Kexample.org.ksk.private ]
+  run docker exec nsd [ -f /zones/Kexample.org.ksk.private ]
   assert_success
-  run docker exec nsd_unsigned [ -f /zones/Kexample.org.zsk.key ]
+  run docker exec nsd [ -f /zones/Kexample.org.zsk.key ]
   assert_success
-  run docker exec nsd_unsigned [ -f /zones/Kexample.org.zsk.private ]
+  run docker exec nsd [ -f /zones/Kexample.org.zsk.private ]
   assert_success
 }
 
-@test "check DS records" {
-  run docker exec nsd_default ds-records example.org
+@test "signzone default date" {
+  run docker exec nsd keygen example.org
+  assert_success
+  assert_line --index 0 'Using default expiration date: 1 month later from now'
+  assert_line --index 1 'Signing zone for example.org'
+}
+
+@test "signzone custom date" {
+  run docker exec nsd keygen example.org 20200101
+  assert_success
+  assert_line --index 0 'Signature will expire on 20200101'
+  assert_line --index 1 'Signing zone for example.org'
+}
+
+@test "reloadzone" {
+  run docker exec nsd reloadzone example.org
+  assert_success
+  assert_line --index 0 'Reloading zone for example.org... ok'
+  assert_line --index 1 'Notify slave servers (if any)... ok'
+  assert_line --index 2 'Done'
+}
+
+@test "incrementzone" {
+  run docker exec nsd reloadzone example.org
+  assert_success
+  assert_line --index 0 'Previous serial is 2019043001'
+  assert_line --index 1 'Previous serial is 2019043002'
+}
+
+@test "ds-record" {
+  run docker exec nsd ds-records example.org
   assert_success
   assert_line --index 0 '> DS record 1 [Digest Type = SHA1]:'
   assert_line --index 1 --regexp '^example.org.	3600	IN	DS	[0-9]{2,5} 14 1 [0-9a-f]{40}$'
@@ -47,7 +76,7 @@ load 'test_helper/bats-assert/load'
 }
 
 @test "dig result" {
-  run bash -c "dig example.org @$(docker inspect --format '{{.NetworkSettings.IPAddress}}' nsd_default) | grep -v '^;'"
+  run bash -c "dig example.org @$(docker inspect --format '{{.NetworkSettings.IPAddress}}' nsd) | grep -v '^;'"
   assert_success
   assert_line --index 0 'example.org.		3600	IN	A	10.20.30.40'
   assert_line --index 1 'example.org.		3600	IN	NS	ns1.example.org.'
@@ -57,7 +86,7 @@ load 'test_helper/bats-assert/load'
 }
 
 @test "dig rrsig result" {
-  run bash -c "dig example.org RRSIG @$(docker inspect --format '{{.NetworkSettings.IPAddress}}' nsd_default) | grep -v '^;'"
+  run bash -c "dig example.org RRSIG @$(docker inspect --format '{{.NetworkSettings.IPAddress}}' nsd) | grep -v '^;'"
   assert_success
   assert_line --index 0 --regexp '^example.org.		3600	IN	RRSIG	SOA 14 2 3600 '
   assert_line --index 1 --regexp '^example.org.		3600	IN	RRSIG	A 14 2 3600 '
