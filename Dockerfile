@@ -6,7 +6,6 @@ ARG NSD_VERSION=4.2.3
 ARG GPG_FINGERPRINT="EDFAA3F2CA4E6EB05681AF8E9F6F1C2D7E045F8D"
 ARG SHA256_HASH="817d963b39d2af982f6a523f905cfd5b14a3707220a8da8f3013f34cdfe5c498"
 
-SHELL [ "/bin/bash", "-o", "pipefail", "-c" ]
 
 RUN apk add --no-cache \
       bash \
@@ -16,6 +15,8 @@ RUN apk add --no-cache \
       libevent-dev \
       openssl-dev \
       ca-certificates
+
+SHELL [ "/bin/bash", "-o", "pipefail", "-c" ]
 
 WORKDIR /tmp
 RUN \
