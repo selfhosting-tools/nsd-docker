@@ -60,8 +60,8 @@ load 'test_helper/bats-assert/load'
 @test "incrementzone" {
   run docker exec nsd incrementzone example.org
   assert_success
-  assert_line --index 0 'Previous serial is 2019043001'
-  assert_line --index 1 'Previous serial is 2019043002'
+  assert_line --index 0 'Previous serial is 2019043003'  # incremented 2 times by previous tests
+  assert_line --index 1 'Previous serial is 2019043004'
 }
 
 @test "ds-record" {
