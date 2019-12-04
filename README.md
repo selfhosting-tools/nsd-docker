@@ -2,52 +2,50 @@
 
 [![Build Status](https://travis-ci.org/selfhosting-tools/nsd-docker.svg?branch=master)](https://travis-ci.org/selfhosting-tools/nsd-docker)
 
-Based on [hardware/nsd-dnssec](https://github.com/hardware/nsd-dnssec)
+## What is this software
 
-:warning: **WIP** *Refactoring in progress*
-
-### What is this?
-
-NSD is an authoritative only, high performance, simple and open source name server.
+[NSD](https://www.nlnetlabs.nl/projects/nsd/about/) is an authoritative only, high performance, simple and open source name server released under the BSD licence.
+This work is originally based on [hardware/nsd-dnssec](https://github.com/hardware/nsd-dnssec).
 
 ### Features
 
-- Lightweight & secure image (no root process)
-- Based on Alpine Linux
-- Latest NSD version (4.2.1 - Jul 9, 2019)
-- ZSK and KSK keys, DS-Records management and zone signature with ldns
+- Lightweight & secure image (based on Alpine, multi-stage build, no root process)
+- Latest NSD version with hardening compilation options
+- Helper scripts for generating ZSK and KSK keys, DS-Records management and zone signature
 
-### Build-time variables
+### Run with Docker-compose
 
-- **NSD_VERSION** : version of NSD
-- **GPG_SHORTID** : short gpg key ID
-- **GPG_FINGERPRINT** : fingerprint of signing key
-- **SHA256_HASH** : SHA256 hash of NSD archive
+```docker-compose
+version: '3.7'
 
-### Ports
-
-- **53/tcp**
-- **53/udp** (for AXFR zones transfer queries)
-
-### Environment variables
-
-| Variable | Description | Type | Default value |
-| -------- | ----------- | ---- | ------------- |
-| **UID** | nsd user id | *optional* | 991
-| **GID** | nsd group id | *optional* | 991
-
-### Setup
-
-Put your dns zone file in `/mnt/docker/nsd/zones/db.domain.tld`.
-
-Example:
-
+services:
+  nsd:
+    container_name: nsd
+    restart: always
+    image: selfhostingtools/nsd-docker:latest
+    read_only: true
+    tmpfs:
+      - /tmp
+    volumes:
+      - /mnt/nsd/conf:/etc/nsd
+      - /mnt/nsd/zones:/zones:ro
+      - /mnt/nsd/db:/var/db/nsd
+    ports:
+      - 53:53
+      - 53:53/udp
 ```
+
+`/etc/nsd` can be mounted read-only after the first run.
+
+#### Configuration example
+
+Put your dns zone file in `/mnt/nsd/zones/db.domain.tld`.
+
+```zone
 $ORIGIN domain.tld.
-$TTL 7200
+$TTL 3600
 
 ; SOA
-
 @       IN      SOA    ns1.domain.tld. hostmaster.domain.tld. (
                                         2016020202 ; Serial
                                         7200       ; Refresh
@@ -56,125 +54,64 @@ $TTL 7200
                                         86400 )    ; Minimum
 
 ; NAMESERVERS
-
 @                   IN                NS                   ns1.domain.tld.
 @                   IN                NS                   ns2.domain.tld.
 
 ; A RECORDS
-
 @                   IN                A                    IPv4
 hostname            IN                A                    IPv4
 ns1                 IN                A                    IPv4
 ns2                 IN                A                    IPv4
 
 ; CNAME RECORDS
-
 www                 IN                CNAME                hostname
 
 ; MAIL RECORDS
-
 @                   IN                MX          10       hostname.domain.tld.
 
 ...
 ```
 
-Put the nsd config in `/mnt/docker/nsd/conf/nsd.conf`.
-
-Primary server example:
+Put the nsd config in `/mnt/nsd/conf/nsd.conf`.
 
 ```yaml
 server:
   server-count: 1
-  ip4-only: yes
+  verbosity: 2
   hide-version: yes
-  identity: ""
   zonesdir: "/zones"
-
-remote-control:
-  control-enable: yes
-
-key:
-  name: "sec_key"
-  algorithm: hmac-sha256
-  secret: "WU9VUl9TRUNSRVRfS0VZCg==" # echo "YOUR_SECRET_KEY" | base64
 
 zone:
   name: domain.tld
   zonefile: db.domain.tld.signed
-  notify: ip_of_secondary_server sec_key
-  notify: ip_of_secondary_public_server NOKEY
-  provide-xfr: ip_of_secondary_server sec_key
-  provide-xfr: ip_of_secondary_public_server NOKEY
-
-# "ip_of_secondary_server" is your secondary nameserver IP
-# "ip_of_secondary_public_server" can be your registrar's nameserver IP
 ```
 
-Secondary server example (optional):
+Check the [documentation](https://www.nlnetlabs.nl/documentation/nsd/) to see all options.
 
-```yaml
-server:
-  server-count: 1
-  ip4-only: yes
-  hide-version: yes
-  identity: ""
-  zonesdir: "/zones"
-
-remote-control:
-  control-enable: yes
-
-key:
-  name: "sec_key"
-  algorithm: hmac-sha256
-  secret: "WU9VUl9TRUNSRVRfS0VZCg=="
-
-zone:
-  name: domain.tld
-  zonefile: db.domain.tld.signed
-  allow-notify: ip_of_primary_server sec_key
-  request-xfr: AXFR ip_of_primary_server sec_key
-
-# "ip_of_primary_server" is your primary nameserver IP
-```
+#### Check the configuration
 
 Check your zone and nsd configuration:
 
-```
-cd /mnt/docker/nsd
-docker run --rm -v `pwd`/zones:/zones -ti hardware/nsd-dnssec nsd-checkzone domain.tld /zones/db.domain.tld
-docker run --rm -v `pwd`/conf:/etc/nsd -ti hardware/nsd-dnssec nsd-checkconf /etc/nsd/nsd.conf
-```
-
-### Docker-compose
-
-#### Docker-compose.yml
-
-```yaml
-nsd:
-  image: hardware/nsd-dnssec
-  container_name: nsd
-  ports:
-    - "PUBLIC_IP_ADDRESS:53:53"
-    - "PUBLIC_IP_ADDRESS:53:53/udp"
-  volumes:
-    - /mnt/docker/nsd/conf:/etc/nsd
-    - /mnt/docker/nsd/zones:/zones
-    - /mnt/docker/nsd/db:/var/db/nsd
+```sh
+cd /mnt/nsd
+docker run -it --rm -v $(pwd)/zones:/zones selfhostingtools/nsd-docker nsd-checkzone domain.tld /zones/db.domain.tld
+docker run -it --rm -v $(pwd)/conf:/etc/nsd selfhostingtools/nsd-docker nsd-checkconf /etc/nsd/nsd.conf
 ```
 
-**Note** : replace `PUBLIC_IP_ADDRESS` with your public IP address.
+#### Environment variables
 
-#### Run it
+You may want to change the running user:
 
-```
-docker-compose up -d
-```
+| Variable | Description  | Type       | Default value |
+| -------- | -----------  | ----       | ------------- |
+| **UID**  | nsd user id  | *optional* | 991           |
+| **GID**  | nsd group id | *optional* | 991           |
 
 ### Generating DNSSEC keys and signed zone
 
 Generate ZSK and KSK keys with ECDSAP384SHA384 algorithm (it may take some time; you can install `haveged` in your base system to speed it up):
 
-```
+```sh
 docker-compose exec nsd keygen domain.tld
 
 Generating ZSK & KSK keys for 'domain.tld'
@@ -201,33 +138,9 @@ docker-compose exec nsd signzone domain.tld 20170205220210
 
 :warning: **Do not forget to add a cron task to increment the serial and sign your zone periodically to avoid the expiration of RRSIG RR records!**
 
-This example shows how to update the serial and your TLSA record (if you have one) programmatically :
-
-```bash
-#!/bin/bash
-
-LETS_ENCRYPT_LIVE_PATH=/path/to/your/lets/encrypt/folder
-fingerprint=$(openssl x509 -noout -in "${LETS_ENCRYPT_LIVE_PATH}/cert.pem" -fingerprint -sha256 | cut -c 20- | sed s/://g)
-
-domain="domain.tld"
-zonename="db.${domain}"
-zonefile="/mnt/docker/nsd/zones/${zonename}"
-serial=$(date -d "+1 day" +'%Y%m%d%H')
-tlsa_line_number=$(grep -n TLSA $zonefile | cut -d : -f 1)
-tlsa_dns_record="_dane IN TLSA 3 0 1 ${fingerprint}"
-expiration_date=$(date -d "+6 months" +'%Y%m%d%H%M%S')
-
-sed -i -e "s/20[0-9][0-9]\{7\} ; Serial/${serial} ; Serial/g" \
-       -e "${tlsa_line_number}s/.*/${tlsa_dns_record}/" $zonefile
-
-if docker exec nsd nsd-checkzone "$domain" /zones/"$zonename" | grep -q "zone ${domain} is ok"; then
-  docker exec nsd signzone "$domain" "$expiration_date"
-fi
-```
-
 Show your DS-Records (Delegation Signer):
 
-```
+```sh
 docker-compose exec nsd ds-records domain.tld
 
 > DS record 1 [Digest Type = SHA1] :
@@ -242,6 +155,14 @@ domain.tld. IN DNSKEY 257 3 14 xxxxxxxxxxxxxx ; {id = xxxx (ksk), size = 384b}
 
 Restart the DNS server to take the changes into account:
 
-```
+```sh
 docker-compose restart nsd
 ```
+
+## Build the image
+
+Build-time variables:
+
+- **NSD_VERSION** : version of NSD
+- **GPG_FINGERPRINT** : fingerprint of signing key
+- **SHA256_HASH** : SHA256 hash of NSD archive
