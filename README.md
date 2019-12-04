@@ -9,7 +9,7 @@ This work is originally based on [hardware/nsd-dnssec](https://github.com/hardwa
 
 ### Features
 
-- Lightweight & secure image (based on Alpine, multi-stage build, no root process)
+- Lightweight & secure image (based on Alpine & multi-stage build: 4MB, no root process)
 - Latest NSD version with hardening compilation options
 - Helper scripts for generating ZSK and KSK keys, DS-Records management and zone signature
 
@@ -42,14 +42,15 @@ services:
 
 #### Configuration example
 
-Put your dns zone file in `/mnt/nsd/zones/db.domain.tld`.
+Put your dns zone file in `/mnt/nsd/zones/domain.tld`.
 
 ```bind
 $ORIGIN domain.tld.
 $TTL 3600
 
 ; SOA
-@       IN      SOA    ns1.domain.tld. hostmaster.domain.tld. 2016020202 7200 1800 1209600 86400
+; SOA record should be on one line to use provided helper scripts
+@   IN   SOA   ns1.domain.tld. hostmaster.domain.tld. 2016020202 7200 1800 1209600 86400
 
 ; NAMESERVERS
 @                   IN                NS                   ns1.domain.tld.
@@ -85,7 +86,8 @@ remote-control:
 
 zone:
   name: domain.tld
-  zonefile: db.domain.tld.signed
+  #zonefile: domain.tld  # if not signed
+  zonefile: domain.tld.signed
 ```
 
 Check the [documentation](https://www.nlnetlabs.nl/documentation/nsd/) to see all options.
@@ -96,7 +98,7 @@ Check your zone and nsd configuration:
 
 ```sh
 cd /mnt/nsd
-docker run -it --rm -v $(pwd)/zones:/zones selfhostingtools/nsd-docker nsd-checkzone domain.tld /zones/db.domain.tld
+docker run -it --rm -v $(pwd)/zones:/zones selfhostingtools/nsd-docker nsd-checkzone domain.tld /zones/domain.tld
 docker run -it --rm -v $(pwd)/conf:/etc/nsd selfhostingtools/nsd-docker nsd-checkconf /etc/nsd/nsd.conf
 ```
 
@@ -125,34 +127,16 @@ Then sign your dns zone (default expiration date is 1 month):
 ```sh
 docker-compose exec nsd signzone domain.tld
 
-Signing zone for domain.tld
-NSD configuration rebuild... reconfig start, read /etc/nsd/nsd.conf
-ok
-Reloading zone for domain.tld... ok
-Notify slave servers... ok
-Done.
-
 # or set custom RRSIG RR expiration date :
-
 docker-compose exec nsd signzone domain.tld [YYYYMMDDhhmmss]
-docker-compose exec nsd signzone domain.tld 20170205220210
 ```
 
-:warning: **Do not forget to add a cron task to increment the serial and sign your zone periodically to avoid the expiration of RRSIG RR records!**
+:warning: **Do not forget to add a cron task to sign your zone periodically to avoid the expiration of RRSIG RR records!**
 
 Show your DS-Records (Delegation Signer):
 
 ```sh
 docker-compose exec nsd ds-records domain.tld
-
-> DS record 1 [Digest Type = SHA1] :
-domain.tld. 600 IN DS xxxx 14 1 xxxxxxxxxxxxxx
-
-> DS record 2 [Digest Type = SHA256] :
-domain.tld. 600 IN DS xxxx 14 2 xxxxxxxxxxxxxx
-
-> Public KSK Key :
-domain.tld. IN DNSKEY 257 3 14 xxxxxxxxxxxxxx ; {id = xxxx (ksk), size = 384b}
 ```
 
 Restart the DNS server to take the changes into account:
@@ -160,6 +144,8 @@ Restart the DNS server to take the changes into account:
 ```sh
 docker-compose restart nsd
 ```
+
+Ensure zonefile parameter is correctly set (e.g. domain.tld.signed) in nsd.conf.
 
 ## Build the image
 
