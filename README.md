@@ -1,6 +1,7 @@
 # selfhosting-tools/nsd-docker
 
 [![Build Status](https://travis-ci.org/selfhosting-tools/nsd-docker.svg?branch=master)](https://travis-ci.org/selfhosting-tools/nsd-docker)
+[![Project Status: Active  The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 
 ## What is this software
 
@@ -57,16 +58,8 @@ $TTL 3600
 @                   IN                NS                   ns2.domain.tld.
 
 ; A RECORDS
-@                   IN                A                    IPv4
-hostname            IN                A                    IPv4
-ns1                 IN                A                    IPv4
-ns2                 IN                A                    IPv4
-
-; CNAME RECORDS
-www                 IN                CNAME                hostname
-
-; MAIL RECORDS
-@                   IN                MX          10       hostname.domain.tld.
+@                   IN                A                    1.2.3.4
+www                 IN                A                    5.6.7.8
 
 ...
 ```
@@ -113,25 +106,49 @@ You may want to change the running user:
 
 ### Generating DNSSEC keys and signed zone
 
-Generate ZSK and KSK keys with ECDSAP384SHA384 algorithm (it may take some time; you can install `haveged` in your base system to speed it up):
+Generate ZSK and KSK keys with ECDSAP384SHA384 algorithm:
 
 ```sh
 docker-compose exec nsd keygen domain.tld
-
-Generating ZSK & KSK keys for 'domain.tld'
-Done.
 ```
+
+Keys will be stored in ```/zones/Kdomain.tld.{zsk,ksk}.{key,private}```
 
 Then sign your dns zone (default expiration date is 1 month):
 
 ```sh
 docker-compose exec nsd signzone domain.tld
 
-# or set custom RRSIG RR expiration date :
+# or set custom RRSIG RR expiration date:
 docker-compose exec nsd signzone domain.tld [YYYYMMDDhhmmss]
 ```
 
 :warning: **Do not forget to add a cron task to sign your zone periodically to avoid the expiration of RRSIG RR records!**
+
+This can be done using systemd timer on the host:
+
+```/etc/systemd/system/nsd_update_signature.service```
+
+```systemd
+[Unit]
+Description=NSD update signature
+
+[Service]
+Type=oneshot
+ExecStart=docker exec nsd signzone domain.tld
+```
+
+```/etc/systemd/system/nsd_update_signature.timer```
+
+```systemd
+[Timer]
+OnCalendar=weekly
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Don't forget to enable and start the timer!
 
 Show your DS-Records (Delegation Signer):
 
@@ -139,13 +156,13 @@ Show your DS-Records (Delegation Signer):
 docker-compose exec nsd ds-records domain.tld
 ```
 
-Restart the DNS server to take the changes into account:
+Ensure zonefile parameter is correctly set (e.g. domain.tld.signed) in **nsd.conf**.
+
+Restart nsd to take the changes into account:
 
 ```sh
 docker-compose restart nsd
 ```
-
-Ensure zonefile parameter is correctly set (e.g. domain.tld.signed) in nsd.conf.
 
 ## Build the image
 
