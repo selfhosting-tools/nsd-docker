@@ -14,7 +14,10 @@ script:
   - ./test/bats/bin/bats test/tests.bats
   - bash test/clean.sh
 
-after_success:
-  if: branch = master
+deploy:
+  provider: script
+  script:
     - echo $DOCKER_PASS | docker login -u selfhostingtools --password-stdin
     - docker push selfhostingtools/nsd-docker:latest
+  on:
+    branch: master
