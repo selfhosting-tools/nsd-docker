@@ -35,14 +35,16 @@ services:
       - 53:53/udp
 ```
 
-Ensure mount points match UID/GID (991 by default).
-`/etc/nsd` can be mounted read-only after the first run.
+**Ensure mount points match UID/GID (991 by default) used by nsd.**
+
+`/etc/nsd` can be mounted read-only after the first run.  
+`/zones` can be mounted read-only if helper scripts (e.g. for dnssec) are not used.
 
 #### Configuration example
 
 Put your dns zone file in `/mnt/nsd/zones/db.domain.tld`.
 
-```zone
+```bind
 $ORIGIN domain.tld.
 $TTL 3600
 
