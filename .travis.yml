@@ -4,7 +4,9 @@ services:
   - docker
 
 install:
-  - curl -sL -o $HOME/hadolint https://github.com/hadolint/hadolint/releases/download/v1.17.3/hadolint-Linux-x86_64 && chmod 755 $HOME/hadolint
+  - mkdir -p $HOME/bin
+  - curl -sL -o $HOME/hadolint https://github.com/hadolint/hadolint/releases/download/v1.17.3/hadolint-Linux-x86_64 && chmod 755 $HOME/bin/hadolint
+  - export PATH=$PATH:$HOME/bin
 
 script:
   - bash test/linters.sh
