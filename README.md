@@ -28,13 +28,14 @@ services:
       - /tmp
     volumes:
       - /mnt/nsd/conf:/etc/nsd
-      - /mnt/nsd/zones:/zones:ro
+      - /mnt/nsd/zones:/zones
       - /mnt/nsd/db:/var/db/nsd
     ports:
       - 53:53
       - 53:53/udp
 ```
 
+Ensure mount points match UID/GID (991 by default).
 `/etc/nsd` can be mounted read-only after the first run.
 
 #### Configuration example
@@ -77,9 +78,13 @@ Put the nsd config in `/mnt/nsd/conf/nsd.conf`.
 ```yaml
 server:
   server-count: 1
-  verbosity: 2
+  verbosity: 1
   hide-version: yes
   zonesdir: "/zones"
+
+remote-control:
+  control-enable: yes
+  control-interface: 127.0.0.1
 
 zone:
   name: domain.tld
