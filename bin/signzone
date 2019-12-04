@@ -10,13 +10,18 @@ fi
 
 if [ -n "$EXPIRATION_DATE" ]; then
   arg="-e${EXPIRATION_DATE}"
+  echo "Signature will expire on ${EXPIRATION_DATE}"
+else
+  echo "Using default expiration date: 1 month later from now"
 fi
 
 cd /zones || exit 1
 
 echo "Signing zone for ${DOMAIN}"
 ldns-signzone -n -p ${arg} -s "$(head /dev/urandom | tr -dc A-Za-z0-9 | sha1sum | head -c 30)" \
-  -f "db.${DOMAIN}.signed" "db.${DOMAIN}" "K${DOMAIN}.zsk" "K${DOMAIN}.ksk"
+  -f "${DOMAIN}.signed" "${DOMAIN}" "K${DOMAIN}.zsk" "K${DOMAIN}.ksk"
 
-updatezone "$DOMAIN"
+incrementzone "$DOMAIN"
+reloadzone "$DOMAIN"
+
 exit 0

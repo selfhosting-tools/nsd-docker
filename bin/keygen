@@ -9,6 +9,12 @@ fi
 
 cd /zones || exit 1
 
+if [ -e "K${DOMAIN}.zsk.private" ] || [ -e "K${DOMAIN}.ksk.private" ]; then
+  echo "Keys for this domain already exist"
+  echo "Please remove them (if it's what you want!) before using keygen"
+  exit 2
+fi
+
 echo "Generating ZSK & KSK keys for '${DOMAIN}'"
 ZSK=$(ldns-keygen -a ECDSAP384SHA384 -b 384 "$DOMAIN")
 KSK=$(ldns-keygen -k -a ECDSAP384SHA384 -b 384 "$DOMAIN")
@@ -22,4 +28,5 @@ mv "$KSK".key     "K${DOMAIN}.ksk.key"
 mv "$KSK".private "K${DOMAIN}.ksk.private"
 
 chmod 600 -- *.private
+
 exit 0

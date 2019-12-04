@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# This script only works if SOA record is on one line and is a number
+# In this case, the number is incremented by 1
+
+DOMAIN="$1"
+
+if [ -z "$DOMAIN" ]; then
+  echo "Domain name must be defined" 1>&2
+  exit 1
+fi
+
+cd /zones || exit 1
+
+SERIAL=$(grep 'IN SOA' "$DOMAIN" | awk '{print $6}')
+if [ -n "$SERIAL" ]; then
+  echo "Previous serial is $SERIAL"
+  NEW_SERIAL=$((SERIAL+1))
+  echo "New serial is $NEW_SERIAL"
+  sed -i s/"$SERIAL"/"$NEW_SERIAL"/ "$DOMAIN"
+else
+  echo "Serial not found"
+fi
+
+exit 0

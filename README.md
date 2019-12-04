@@ -49,12 +49,7 @@ $ORIGIN domain.tld.
 $TTL 3600
 
 ; SOA
-@       IN      SOA    ns1.domain.tld. hostmaster.domain.tld. (
-                                        2016020202 ; Serial
-                                        7200       ; Refresh
-                                        1800       ; Retry
-                                        1209600    ; Expire
-                                        86400 )    ; Minimum
+@       IN      SOA    ns1.domain.tld. hostmaster.domain.tld. 2016020202 7200 1800 1209600 86400
 
 ; NAMESERVERS
 @                   IN                NS                   ns1.domain.tld.
