@@ -84,6 +84,7 @@ zone:
   zonefile: domain.tld.signed
 ```
 
+`control-enable: yes` is needed for Docker healthcheck.
 Check the [documentation](https://www.nlnetlabs.nl/documentation/nsd/) to see all options.
 
 #### Check the configuration
@@ -113,7 +114,7 @@ Generate ZSK and KSK keys with ECDSAP384SHA384 algorithm:
 docker-compose exec nsd keygen domain.tld
 ```
 
-Keys will be stored in ```/zones/Kdomain.tld.{zsk,ksk}.{key,private}```
+Keys will be stored in `/zones/Kdomain.tld.{zsk,ksk}.{key,private}`
 
 Then sign your dns zone (default expiration date is 1 month):
 
@@ -128,7 +129,7 @@ docker-compose exec nsd signzone domain.tld [YYYYMMDDhhmmss]
 
 This can be done using systemd timer on the host:
 
-```/etc/systemd/system/nsd_update_signature.service```
+`/etc/systemd/system/nsd_update_signature.service`
 
 ```systemd
 [Unit]
@@ -139,7 +140,7 @@ Type=oneshot
 ExecStart=docker exec nsd signzone domain.tld
 ```
 
-```/etc/systemd/system/nsd_update_signature.timer```
+`/etc/systemd/system/nsd_update_signature.timer`
 
 ```systemd
 [Timer]
