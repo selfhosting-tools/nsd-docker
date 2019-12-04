@@ -15,7 +15,7 @@ This work is originally based on [hardware/nsd-dnssec](https://github.com/hardwa
 
 ### Run with Docker-compose
 
-```docker-compose
+```yaml
 version: '3.7'
 
 services:
@@ -120,7 +120,7 @@ Done.
 
 Then sign your dns zone (default expiration date is 1 month):
 
-```
+```sh
 docker-compose exec nsd signzone domain.tld
 
 Signing zone for domain.tld
