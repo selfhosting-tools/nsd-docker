@@ -6,7 +6,9 @@ ARG NSD_VERSION=4.2.3
 ARG GPG_FINGERPRINT="EDFAA3F2CA4E6EB05681AF8E9F6F1C2D7E045F8D"
 ARG SHA256_HASH="817d963b39d2af982f6a523f905cfd5b14a3707220a8da8f3013f34cdfe5c498"
 
-RUN apk add --no-cache --virtual build-dependencies \
+SHELL [ "/bin/bash", "-o", "pipefail", "-c" ]
+
+RUN apk add --no-cache \
       bash \
       curl \
       gnupg \
@@ -14,7 +16,6 @@ RUN apk add --no-cache --virtual build-dependencies \
       libevent-dev \
       openssl-dev \
       ca-certificates
-SHELL [ "/bin/bash", "-o", "pipefail", "-c" ]
 
 WORKDIR /tmp
 RUN \
@@ -31,7 +32,7 @@ RUN \
                 | sed -n 's#^Primary key fingerprint: \(.*\)#\1#p' | tr -d '[:space:]')" && \
    if [ -z "${FINGERPRINT}" ]; then echo "ERROR: Invalid GPG signature!" && exit 1; fi && \
    if [ "${FINGERPRINT}" != "${GPG_FINGERPRINT}" ]; then echo "ERROR: Wrong GPG fingerprint!" && exit 1; fi && \
-   echo "SHA256 and GPG signature are good"
+   echo "SHA256 and GPG signature are correct"
 
 RUN echo "Extracting nsd-${NSD_VERSION}.tar.gz..." && \
     tar -xzf "nsd-${NSD_VERSION}.tar.gz"
@@ -40,9 +41,9 @@ WORKDIR /tmp/nsd-${NSD_VERSION}
 RUN ./configure \
     CFLAGS="-O2 -flto -fPIE -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -fstack-protector-strong \
             -Wformat -Werror=format-security" \
-    LDFLAGS="-Wl,-z,now -Wl,-z,relro" \
- && make \
- && make install DESTDIR=/builder
+    LDFLAGS="-Wl,-z,now -Wl,-z,relro" && \
+    make && \
+    make install DESTDIR=/builder
 
 
 FROM alpine:latest
