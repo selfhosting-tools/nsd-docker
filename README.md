@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/selfhosting-tools/nsd-docker.svg?branch=master)](https://travis-ci.org/selfhosting-tools/nsd-docker)
 [![Project Status: Active  The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![Docker Hub](https://img.shields.io/docker/pulls/selfhostingtools/nsd-docker.svg)](https://hub.docker.com/r/selfhostingtools/nsd-docker)
 
 ## What is this software
 
