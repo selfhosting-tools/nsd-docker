@@ -12,7 +12,7 @@ fi
 
 cd /zones || exit 1
 
-SERIAL=$(grep 'IN SOA' "$DOMAIN" | awk '{print $6}')
+SERIAL=$(grep 'SOA' "$DOMAIN" | awk '{print $6}')
 if [ -n "$SERIAL" ]; then
   echo "Previous serial is $SERIAL"
   NEW_SERIAL=$((SERIAL+1))
