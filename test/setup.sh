@@ -3,7 +3,7 @@
 set -e
 
 # Build Docker image
-docker build --no-cache -t selfhostingtools/nsd-docker:latest .
+docker build --no-cache -t selfhostingtools/nsd:latest .
 
 # Create test container
 docker run \
@@ -11,7 +11,7 @@ docker run \
     --name nsd \
     -v "$(pwd)/test/resources/conf":/etc/nsd \
     -v "$(pwd)/test/resources/zones":/zones \
-    -t selfhostingtools/nsd-docker:latest
+    -t selfhostingtools/nsd:latest
 
 sleep 2
 

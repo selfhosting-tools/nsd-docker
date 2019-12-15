@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/selfhosting-tools/nsd-docker.svg?branch=master)](https://travis-ci.org/selfhosting-tools/nsd-docker)
 [![Project Status: Active  The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![Docker Hub](https://img.shields.io/docker/pulls/selfhostingtools/nsd-docker.svg)](https://hub.docker.com/r/selfhostingtools/nsd-docker)
+[![Docker Hub](https://img.shields.io/docker/pulls/selfhostingtools/nsd.svg)](https://hub.docker.com/r/selfhostingtools/nsd)
 
 ## What is this software
 
@@ -24,7 +24,7 @@ services:
   nsd:
     container_name: nsd
     restart: always
-    image: selfhostingtools/nsd-docker:latest
+    image: selfhostingtools/nsd:latest
     read_only: true
     tmpfs:
       - /tmp
@@ -93,8 +93,8 @@ Check your zone and nsd configuration:
 
 ```sh
 cd /mnt/nsd
-docker run -it --rm -v $(pwd)/zones:/zones selfhostingtools/nsd-docker nsd-checkzone domain.tld /zones/domain.tld
-docker run -it --rm -v $(pwd)/conf:/etc/nsd selfhostingtools/nsd-docker nsd-checkconf /etc/nsd/nsd.conf
+docker run -it --rm -v $(pwd)/zones:/zones selfhostingtools/nsd nsd-checkzone domain.tld /zones/domain.tld
+docker run -it --rm -v $(pwd)/conf:/etc/nsd selfhostingtools/nsd nsd-checkconf /etc/nsd/nsd.conf
 ```
 
 #### Environment variables

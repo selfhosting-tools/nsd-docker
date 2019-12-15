@@ -16,6 +16,6 @@ script:
 
 deploy:
   provider: script
-  script: echo $DOCKER_PASS | docker login -u selfhostingtools --password-stdin && docker push selfhostingtools/nsd-docker:latest
+  script: echo $DOCKER_PASS | docker login -u selfhostingtools --password-stdin && docker push selfhostingtools/nsd:latest
   on:
     branch: master
