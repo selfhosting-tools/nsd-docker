@@ -1,6 +1,8 @@
 load 'test_helper/bats-support/load'
 load 'test_helper/bats-assert/load'
 
+CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
+
 
 @test "check zone" {
   run docker exec nsd nsd-checkzone example.org /zones/example.org
@@ -76,7 +78,7 @@ load 'test_helper/bats-assert/load'
 }
 
 @test "dig result" {
-  run bash -c "dig example.org @$(docker inspect --format '{{.NetworkSettings.IPAddress}}' nsd) | grep -v '^;'"
+  run bash -c "dig example.org @$CONTAINER_IP | grep -v '^;'"
   assert_success
   assert_line --index 0 'example.org.		3600	IN	A	10.20.30.40'
   assert_line --index 1 'example.org.		3600	IN	NS	ns1.example.org.'
@@ -86,7 +88,7 @@ load 'test_helper/bats-assert/load'
 }
 
 @test "dig rrsig result" {
-  run bash -c "dig example.org RRSIG @$(docker inspect --format '{{.NetworkSettings.IPAddress}}' nsd) | grep -v '^;'"
+  run bash -c "dig example.org RRSIG @$CONTAINER_IP | grep -v '^;'"
   assert_success
   assert_line --index 0 --regexp '^example.org.		3600	IN	RRSIG	SOA 14 2 3600 '
   assert_line --index 1 --regexp '^example.org.		3600	IN	RRSIG	A 14 2 3600 '
