@@ -1,7 +1,7 @@
 load 'test_helper/bats-support/load'
 load 'test_helper/bats-assert/load'
 
-CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
+CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nsd)
 
 
 @test "check zone" {
