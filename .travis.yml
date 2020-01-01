@@ -19,3 +19,7 @@ deploy:
   script: echo $DOCKER_PASS | docker login -u selfhostingtools --password-stdin && docker push selfhostingtools/nsd:latest
   on:
     branch: master
+
+notifications:
+  email:
+    - secure: "GFwVsC3tn0lIUjS3SSPZ+JTYdREUBsu/yHARYe/gmCQB/I6xrCkTsIzj8wnyajGhPivSiO0WkULN1TuPt/MmA5VAcYc01TK/+pBfEPv4Zq/vaWe4GISyzA7SOK7KEbJsux5RFySsp+YghBCtuNfabfsnwYHHrVIqpSPyL1xd0nheR3ayM96EVFI0DBrkEEmxGG4LFv+4l6QwHjmtkoeXEb3Uj2dygNssqCbV9MoEhRMq8EaoCE/lBzoLyZ2Zl7F8mCUXBxAzB8XkfvFdU6h1sCfdSGJLrcYMNdpr2wXzYNRT9zn7LqHOFz06Yg2rBLnK9LmCkmLAyBFVNjxvnhj8d201wi8XZiWiTKw48IZc4i6AuScgkoj1m7KSlKmpTmi51sQgNiQVBD0bmpGmjwG1ryhcE1BvPfDOnVxhHCFAYgpOLJeqT6CSTAhuV4gr0leyEvrdgib0SViFdECNySHicjIBlYUXw5mFSrhmCIKNpEMIqQ5SeFaCq8usw4Ue/yot+/CEC6zZf1P6JPAOQPZlT+sl3rcaxGD1Y6C4eA3kOKCmZV4HcAhQ/t/0GBLwH0fLbLdffw1vz6h3WxbNr7DW94aNz7cspJQ8buh2Xr95H68LZSjveGHbWkeS5Nd3qUTxE3t1w4d4j0y4O755nJ1Cl43SN6xze7ow+uQ0IZ/9Q70="
