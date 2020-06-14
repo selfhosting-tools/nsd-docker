@@ -1,7 +1,7 @@
 # selfhosting-tools/nsd-docker
 
 ![main](https://github.com/selfhosting-tools/nsd-docker/workflows/main/badge.svg?branch=master)
-[![Project Status: Active  The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![Project Status: WIP  Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 [![Docker Hub](https://img.shields.io/docker/pulls/selfhostingtools/nsd.svg)](https://hub.docker.com/r/selfhostingtools/nsd)
 
 ## What is this software
@@ -15,6 +15,8 @@ This work is originally based on [hardware/nsd-dnssec](https://github.com/hardwa
 - Latest NSD version with hardening compilation options
 - Helper scripts for generating ZSK and KSK keys, DS-Records management and zone signature
 - Optimized to be run on Kubernetes with ConfigMap
+
+:warning: Refactoring ongoing
 
 ### Run on Kubernetes
 
@@ -37,6 +39,7 @@ services:
     volumes:
       - /mnt/nsd/conf:/etc/nsd:ro
       - /mnt/nsd/zones:/zones
+      - /mnt/nsd/keys:/keys:ro
     ports:
       - 53:53
       - 53:53/udp
