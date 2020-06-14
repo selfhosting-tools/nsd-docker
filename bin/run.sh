@@ -1,5 +1,13 @@
 #!/bin/sh
 
+set -e
+set -x
+
+# Copy config from /config if it exists
+if [ -e /config/nsd.conf ]; then
+  cp /config/nsd.conf /etc/nsd
+fi
+
 if [ ! -f /etc/nsd/nsd_server.pem ]; then
   nsd-control-setup
 fi
