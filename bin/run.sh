@@ -3,6 +3,10 @@
 set -e
 set -x
 
+# Deprecation warning
+echo "DEPRECATION WARNING: latest tag won't be updated anymore"
+echo "Please check https://github.com/selfhosting-tools/nsd-docker"
+
 # Copy config from /config if it exists
 if [ -e /config/nsd.conf ]; then
   cp /config/nsd.conf /etc/nsd
