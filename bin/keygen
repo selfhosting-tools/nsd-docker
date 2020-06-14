@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -euo pipefail
+
 DOMAIN="$1"
 
 if [ -z "$DOMAIN" ]; then
@@ -7,13 +9,13 @@ if [ -z "$DOMAIN" ]; then
   exit 1
 fi
 
-cd /zones || exit 1
-
-if [ -e "K${DOMAIN}.zsk.private" ] || [ -e "K${DOMAIN}.ksk.private" ]; then
+if [ -e "/keys/K${DOMAIN}.zsk.private" ] || [ -e "/keys/K${DOMAIN}.ksk.private" ]; then
   echo "Keys for this domain already exist"
   echo "Please remove them (if it's what you want!) before using keygen"
   exit 2
 fi
+
+cd /tmp
 
 echo "Generating ZSK & KSK keys for '${DOMAIN}'"
 ZSK=$(ldns-keygen -a ECDSAP384SHA384 -b 384 "$DOMAIN")
@@ -21,12 +23,13 @@ KSK=$(ldns-keygen -k -a ECDSAP384SHA384 -b 384 "$DOMAIN")
 
 rm -f "$ZSK".ds "$KSK".ds
 
-mv "$ZSK".key     "K${DOMAIN}.zsk.key"
-mv "$ZSK".private "K${DOMAIN}.zsk.private"
+mv "$ZSK".key     "/keys/K${DOMAIN}.zsk.key"
+mv "$ZSK".private "/keys/K${DOMAIN}.zsk.private"
 
-mv "$KSK".key     "K${DOMAIN}.ksk.key"
-mv "$KSK".private "K${DOMAIN}.ksk.private"
+mv "$KSK".key     "/keys/K${DOMAIN}.ksk.key"
+mv "$KSK".private "/keys/K${DOMAIN}.ksk.private"
 
-chmod 600 -- *.private
+chmod 600 -- "/keys/K${DOMAIN}.zsk.private"
+chmod 600 -- "/keys/K${DOMAIN}.ksk.private"
 
 exit 0

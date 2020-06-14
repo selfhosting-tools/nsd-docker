@@ -2,7 +2,7 @@ $ORIGIN example.org.
 $TTL 3600
 
 ; SOA
-@                   IN                SOA                  ns1.example.org. hostmaster.example.org. 2019043001 3600 1800 1209600 600
+@                   IN                SOA                  ns1.example.org. hostmaster.example.org. 2019043019 3600 1800 1209600 600
 
 ; NAMESERVERS
 @                   IN                NS                   ns1.example.org.

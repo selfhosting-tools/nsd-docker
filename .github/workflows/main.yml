@@ -1,0 +1,28 @@
+name: main
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup tests
+      run: bash tests/setup.sh
+    - name: Run tests
+      run: bash tests/test.sh
+    - uses: docker/build-push-action@v1.1.0
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: selfhostingtools/nsd
+        tags: v1
+    - uses: docker/build-push-action@v1.1.0
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        registry: docker.pkg.github.com
+        repository: selfhosting-tools/nsd-docker/nsd
+        tags: v1

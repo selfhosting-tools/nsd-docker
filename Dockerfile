@@ -1,5 +1,4 @@
 FROM alpine:latest as builder
-LABEL Maintainer "Selfhosting-tools (https://github.com/selfhosting-tools)"
 
 ARG NSD_VERSION=4.3.1
 ARG GPG_FINGERPRINT="EDFAA3F2CA4E6EB05681AF8E9F6F1C2D7E045F8D"
@@ -47,6 +46,7 @@ RUN ./configure \
 
 
 FROM alpine:latest
+
 LABEL Maintainer "Selfhosting-tools (https://github.com/selfhosting-tools)"
 
 ENV UID=991 GID=991
@@ -61,9 +61,6 @@ RUN apk add --no-cache \
 COPY --from=builder /builder /
 COPY bin /usr/local/bin
 
-VOLUME /zones /etc/nsd /var/db/nsd
 EXPOSE 53 53/udp
-
-HEALTHCHECK --interval=10s --timeout=5s --start-period=10s CMD nsd-control status
 
 CMD ["run.sh"]

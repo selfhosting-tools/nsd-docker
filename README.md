@@ -1,6 +1,6 @@
 # selfhosting-tools/nsd-docker
 
-[![Build Status](https://travis-ci.org/selfhosting-tools/nsd-docker.svg?branch=master)](https://travis-ci.org/selfhosting-tools/nsd-docker)
+![main](https://github.com/selfhosting-tools/nsd-docker/workflows/main/badge.svg?branch=master)
 [![Project Status: Active  The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Docker Hub](https://img.shields.io/docker/pulls/selfhostingtools/nsd.svg)](https://hub.docker.com/r/selfhostingtools/nsd)
 
@@ -14,6 +14,11 @@ This work is originally based on [hardware/nsd-dnssec](https://github.com/hardwa
 - Lightweight & secure image (based on Alpine & multi-stage build: 4MB, no root process)
 - Latest NSD version with hardening compilation options
 - Helper scripts for generating ZSK and KSK keys, DS-Records management and zone signature
+- Optimized to be run on Kubernetes with ConfigMap
+
+### Run on Kubernetes
+
+TODO
 
 ### Run with Docker-compose
 
@@ -28,10 +33,10 @@ services:
     read_only: true
     tmpfs:
       - /tmp
+      - /var/db/nsd
     volumes:
-      - /mnt/nsd/conf:/etc/nsd
+      - /mnt/nsd/conf:/etc/nsd:ro
       - /mnt/nsd/zones:/zones
-      - /mnt/nsd/db:/var/db/nsd
     ports:
       - 53:53
       - 53:53/udp
@@ -39,8 +44,9 @@ services:
 
 **Ensure mount points match UID/GID (991 by default) used by nsd.**
 
-`/etc/nsd` can be mounted read-only after the first run.  
-`/zones` can be mounted read-only if helper scripts (e.g. for dnssec) are not used.
+`/etc/nsd` should be mounted read-only.  
+`/zones` can be mounted read-only if helper scripts (e.g. for dnssec) are not used.  
+`/keys` should be mounted read-only if keygen helper script is not used.
 
 #### Configuration example
 
@@ -74,17 +80,12 @@ server:
   hide-version: yes
   zonesdir: "/zones"
 
-remote-control:
-  control-enable: yes
-  control-interface: 127.0.0.1
-
 zone:
   name: domain.tld
   #zonefile: domain.tld  # if not signed
   zonefile: domain.tld.signed
 ```
 
-`control-enable: yes` is needed for Docker healthcheck.
 Check the [documentation](https://www.nlnetlabs.nl/documentation/nsd/) to see all options.
 
 #### Check the configuration
@@ -114,7 +115,7 @@ Generate ZSK and KSK keys with ECDSAP384SHA384 algorithm:
 docker-compose exec nsd keygen domain.tld
 ```
 
-Keys will be stored in `/zones/Kdomain.tld.{zsk,ksk}.{key,private}`
+Keys will be stored in `/keys/Kdomain.tld.{zsk,ksk}.{key,private}`
 
 Then sign your dns zone (default expiration date is 1 month):
 

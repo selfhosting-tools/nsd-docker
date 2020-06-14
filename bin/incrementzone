@@ -3,6 +3,8 @@
 # This script only works if SOA record is on one line and is a number
 # In this case, the number is incremented by 1
 
+set -euo pipefail
+
 DOMAIN="$1"
 
 if [ -z "$DOMAIN" ]; then
@@ -10,7 +12,7 @@ if [ -z "$DOMAIN" ]; then
   exit 1
 fi
 
-cd /zones || exit 1
+cd /zones
 
 SERIAL=$(grep '^@.*IN.*SOA.*' "$DOMAIN" | awk '{print $6}')
 if [ -n "$SERIAL" ]; then

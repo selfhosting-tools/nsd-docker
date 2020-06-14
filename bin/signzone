@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -eo pipefail
+
 DOMAIN="$1"
 EXPIRATION_DATE="$2"
 
@@ -19,9 +21,8 @@ cd /zones || exit 1
 
 echo "Signing zone for ${DOMAIN}"
 ldns-signzone -n -p ${arg} -s "$(head /dev/urandom | tr -dc A-Za-z0-9 | sha1sum | head -c 30)" \
-  -f "${DOMAIN}.signed" "${DOMAIN}" "K${DOMAIN}.zsk" "K${DOMAIN}.ksk"
+  -f "${DOMAIN}.signed" "${DOMAIN}" "/keys/K${DOMAIN}.zsk" "/keys/K${DOMAIN}.ksk"
 
 incrementzone "$DOMAIN"
-reloadzone "$DOMAIN"
 
 exit 0
