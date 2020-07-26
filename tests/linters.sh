@@ -3,6 +3,6 @@
 set -e
 set -x
 
-shellcheck bin/*.sh test/*.sh
+shellcheck bin/* test/*.sh
 
 hadolint Dockerfile

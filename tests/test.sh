@@ -22,8 +22,8 @@ docker exec nsd [ -f /keys/Kexample.org.zsk.private ]
 docker exec nsd signzone example.org 20200101
 docker exec nsd signzone example.org
 
-# incrementzone
-docker exec nsd incrementzone example.org
+# updateserial
+docker exec nsd updateserial example.org
 
 # dig
 dig example.org @$CONTAINER_IP

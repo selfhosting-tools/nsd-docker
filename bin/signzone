@@ -17,12 +17,14 @@ else
   echo "Using default expiration date: 1 month later from now"
 fi
 
-cd /zones || exit 1
+cd /zones
+
+updateserial "$DOMAIN"
 
 echo "Signing zone for ${DOMAIN}"
-ldns-signzone -n -p ${arg} -s "$(head /dev/urandom | tr -dc A-Za-z0-9 | sha1sum | head -c 30)" \
-  -f "${DOMAIN}.signed" "${DOMAIN}" "/keys/K${DOMAIN}.zsk" "/keys/K${DOMAIN}.ksk"
+ldns-signzone ${arg} -n -s "$(head /dev/urandom | tr -dc A-Za-z0-9 | sha1sum | head -c 30)" \
+  -f "/zones/${DOMAIN}.signed" "${DOMAIN}" "/keys/K${DOMAIN}.zsk" "/keys/K${DOMAIN}.ksk"
 
-incrementzone "$DOMAIN"
+echo "Signed zone stored in /zones/${DOMAIN}.signed"
 
 exit 0

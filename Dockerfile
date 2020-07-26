@@ -49,8 +49,6 @@ FROM alpine:latest
 
 LABEL Maintainer "Selfhosting-tools (https://github.com/selfhosting-tools)"
 
-ENV UID=991 GID=991
-
 RUN apk add --no-cache \
    ldns \
    ldns-tools \
@@ -61,6 +59,8 @@ RUN apk add --no-cache \
 COPY --from=builder /builder /
 COPY bin /usr/local/bin
 
+ENV UID=991 GID=991
+
 EXPOSE 53 53/udp
 
-CMD ["run.sh"]
+CMD ["start_nsd.sh"]

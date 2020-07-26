@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# This script only works if SOA record is on one line and is a number
-# In this case, the number is incremented by 1
+# This script only works if SOA record is on one line
+# In this case, the serial is replaced by the epoch (in seconds)
 
 set -euo pipefail
 
@@ -16,12 +16,12 @@ cd /zones
 
 SERIAL=$(grep '^@.*IN.*SOA.*' "$DOMAIN" | awk '{print $6}')
 if [ -n "$SERIAL" ]; then
-  echo "Previous serial is $SERIAL"
-  NEW_SERIAL=$((SERIAL+1))
-  echo "New serial is $NEW_SERIAL"
+  NEW_SERIAL=$(date +%s)
   sed -i s/"$SERIAL"/"$NEW_SERIAL"/ "$DOMAIN"
+  echo "Serial updated for $DOMAIN"
 else
-  echo "Serial not found"
+  echo "Serial not found for $DOMAIN" 1>&2
+  exit 2
 fi
 
 exit 0
