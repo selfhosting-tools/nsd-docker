@@ -1,8 +1,8 @@
 # selfhosting-tools/nsd-docker
 
-![main](https://github.com/selfhosting-tools/nsd-docker/workflows/main/badge.svg?branch=master)
-[![Project Status: WIP  Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
-[![Docker Hub](https://img.shields.io/docker/pulls/selfhostingtools/nsd.svg)](https://hub.docker.com/r/selfhostingtools/nsd)
+:warning: This repo is **DEPRECATED**, see [The-Kube-Way/nsd](https://github.com/The-Kube-Way/nsd).  
+
+[![Project Status: Moved to The-Kube-Way/nsd – The project has been moved to a new location, and the version at that location should be considered authoritative.](https://www.repostatus.org/badges/latest/moved.svg)](https://www.repostatus.org/#moved) to [The-Kube-Way/nsd](https://github.com/The-Kube-Way/nsd)
 
 ## What is this software
 
@@ -16,11 +16,9 @@ This work is originally based on [hardware/nsd-dnssec](https://github.com/hardwa
 - Helper scripts for generating ZSK and KSK keys, DS-Records management and zone signature
 - Optimized to be run on Kubernetes with ConfigMap
 
-:warning: Refactoring ongoing
-
 ### Run on Kubernetes
 
-TODO
+See [KUBERNETES.md](KUBERNETES.md)
 
 ### Run with Docker-compose
 
